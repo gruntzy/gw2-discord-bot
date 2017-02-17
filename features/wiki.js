@@ -34,12 +34,12 @@ function messageReceived(message) {
 	let match;
 	if (match = message.content.match(new RegExp(`^!${phrases.get("WIKI_WIKI")} ?(.*)?$`, "i"))) {
 		const terms = match[1];
-		channelAsync.startTypingAsync()
-			.then(() => {
-				if (!terms) throw new Error("no title");
+		channelAsync.startTypingAsync();
+			if (!terms) throw new Error("no title");
 
 				// Get cache if it exists
-				return db.getCachedResponseAsync("wiki", terms).then(cache => {
+			db.getCachedResponseAsync("wiki", terms)
+				.then(cache => {
 					if (typeof cache === "string") return cache;
 
 					// Only search if we have something to search for
@@ -49,8 +49,7 @@ function messageReceived(message) {
 						srsearch: terms,
 						srwhat: "nearmatch"
 					});
-				});
-			})
+				})
 			.then(response => {
 				if (typeof response === "string") return response; // We got a cached response
 				if (response.query.search.length > 0) return response; // We got a live response with results
@@ -115,8 +114,8 @@ function messageReceived(message) {
 						return phrases.get("WIKI_ERROR", { error: err.message || "" });
 				}
 			})
-			.finally(() => channelAsync.stopTypingAsync())
 			.then(text => messageAsync.replyAsync(text));
+			channelAsync.stopTypingAsync();
 	}
 }
 

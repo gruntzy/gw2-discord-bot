@@ -105,8 +105,8 @@ function messageReceived(message) {
 	var character = matches[2].replace(/<@\d+>/, "").trim();
 	if (cmd === phrases.get("BUILDS_PRIVACY")) {
 		var privacy = matches[3].toLowerCase();
-		startTyping(message.channel)
-			.then(() => Promise.all([
+		message.channel.startTyping();
+			Promise.all([
 				db.getUserKeyAsync(message.author.id)
 					.then(key => gw2.requestAsync('/v2/characters', key))
 					.then(characters => {
@@ -115,7 +115,7 @@ function messageReceived(message) {
 						return name;
 					}),
 				db.getObjectAsync('privacy:'+message.author.id)
-			]))
+			])
 			.then(r => {
 				var name = r[0], p = r[1];
 				if (! p) p = {};
@@ -131,9 +131,8 @@ function messageReceived(message) {
 					message.reply(phrases.get("CORE_ERROR"));
 					console.error(err.stack);
 				}
-			})
-			.then(() => message.channel.stopTyping())
-		;
+			});
+			message.channel.stopTyping();
 		return;
 	}
 	var discord_id = message.author.id;
@@ -143,11 +142,9 @@ function messageReceived(message) {
 	var permissions_needed = ['characters'];
 	if (cmd === phrases.get("BUILDS_BUILD")) permissions_needed.push("builds");
 	if (cmd === phrases.get("BUILDS_EQUIP")) permissions_needed.push("inventories");
-	var preamble = startTyping(message.channel)
-		.then(() => {
-			if (message.mentions && message.mentions.length > 1) throw new Error("more than one mention");
-		})
-		.then(() => db.getUserKeyAsync(discord_id))
+	message.channel.startTyping();
+	if (message.mentions && message.mentions.length > 1) throw new Error("more than one mention");
+		var preamble = db.getUserKeyAsync(discord_id)
 		.then(key => {
 			if (! key) throw new Error("endpoint requires authentication");
 			return db.checkKeyPermissionAsync(discord_id, permissions_needed)
@@ -203,8 +200,8 @@ function messageReceived(message) {
 				console.error(err.stack);
 			}
 			return;
-		})
-		.then(() => message.channel.stopTyping())
+		});
+		message.channel.stopTyping();
 	;
 }
 

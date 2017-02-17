@@ -94,7 +94,7 @@ function checkUserAccount(user, callback) {
 }
 
 function messageReceived(message) {
-	if (message.channel.isPrivate) {
+	if (message.channel.type == "dm") {
 		if (message.content.match(new RegExp('^!?'+phrases.get("LINK_LINK")+'$', 'i'))) {
 			// User wants to change API key
 			requestAPIKey(message.author);

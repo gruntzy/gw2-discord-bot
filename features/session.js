@@ -315,15 +315,15 @@ function messageReceived(message) {
 	if (! message.content.match(cmd)) return;
 	var messageAsync = Promise.promisifyAll(message);
 	var channelAsync = Promise.promisifyAll(message.channel);
-	channelAsync.startTyping()
-	.then(() => parseSession(message.author))
+	channelAsync.startTypingAsync();
+	parseSession(message.author)
 	.catch(err => {
 		if (err.message === "no session") return phrases.get("SESSION_NO_SESSION");
 		console.error(err.stack);
 		return phrases.get("CORE_ERROR");
 	})
-	.then(response => messageAsync.reply(response))
-	.then(() => channelAsync.stopTyping());
+	.then(response => messageAsync.reply(response));
+	channelAsync.stopTypingAsync();
 }
 
 module.exports = function(bot) {

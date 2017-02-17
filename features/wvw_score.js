@@ -48,7 +48,10 @@ function messageReceived(message) {
 	var kd_cmd = phrases.get("WVWSCORE_KD");
 	if (! message.content.match(new RegExp('^!('+score_cmd+'|'+relscore_cmd+'|'+kd_cmd+')$', 'i'))) return;
 	async.waterfall([
-		function(next) { message.channel.startTyping(next); },
+		function(next) {
+			message.channel.startTyping();
+			next(null, '');
+		},
 		function(something, next) { db.getAccountByUser(message.author.id, next); },
 		function(account, next) {
 			if (account && account.world) return next(null, account.world);
@@ -93,9 +96,8 @@ function messageReceived(message) {
 		} else {
 			result = phrases.get("WVWSCORE_ERROR");
 		}
-		message.channel.stopTyping(function() {
-			message.reply("```"+result+"```");
-		});
+		message.reply("```"+result+"```");
+		message.channel.stopTyping();
 	});
 }
 
