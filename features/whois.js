@@ -11,7 +11,7 @@ function messageReceived(message) {
 	const channelAsync = Promise.promisifyAll(message.channel);
 
 	if (message.content.match(new RegExp(`^!${phrases.get("WHOIS_WHOIS")} (.*)?$`, "i"))) {
-		if (message.mentions.length === 0) return; // No mentions? No answer
+		if (message.content.indexOf("@") === -1) return; // No mentions? No answer
 		const user = [];
 		user.id = message.content.split("@")[1].split(">").join("");
 		channelAsync.startTypingAsync();
