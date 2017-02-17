@@ -186,21 +186,23 @@ function messageReceived(message) {
 	var makeString;
 	if (cmd === phrases.get("BUILDS_BUILD")) makeString = preamble.then(character => getBuildString(character, type));
 	else if (cmd === phrases.get("BUILDS_EQUIP")) makeString = preamble.then(character => getEquipString(character));
-	makeString
-		.then(string => message.reply(string))
-		.catch(err => {
-			var scope = err.message.match(/^requires scope (.+)?/);
-			if (scope) message.reply(phrases.get("CORE_MISSING_SCOPE", { scope: scope[1] }));
-			else if (err.message === "endpoint requires authentication") message.reply(phrases.get("CORE_NO_KEY"));
-			else if (err.message === "no such character") message.reply(phrases.get("BUILDS_NO_CHARACTER", { name: character }));
-			else if (err.message === "more than one mention") message.reply(phrases.get("BUILDS_TOO_MANY_MENTIONS"));
-			else if (err.message === "private") message.reply(phrases.get("BUILDS_PRIVATE"));
-			else {
-				message.reply(phrases.get("CORE_ERROR"));
-				console.error(err.stack);
-			}
-			return;
-		});
+	if (makeString) {
+		makeString
+			.then(string => message.reply(string))
+			.catch(err => {
+				var scope = err.message.match(/^requires scope (.+)?/);
+				if (scope) message.reply(phrases.get("CORE_MISSING_SCOPE", { scope: scope[1] }));
+				else if (err.message === "endpoint requires authentication") message.reply(phrases.get("CORE_NO_KEY"));
+				else if (err.message === "no such character") message.reply(phrases.get("BUILDS_NO_CHARACTER", { name: character }));
+				else if (err.message === "more than one mention") message.reply(phrases.get("BUILDS_TOO_MANY_MENTIONS"));
+				else if (err.message === "private") message.reply(phrases.get("BUILDS_PRIVATE"));
+				else {
+					message.reply(phrases.get("CORE_ERROR"));
+					console.error(err.stack);
+				}
+				return;
+			});
+		}
 		message.channel.stopTyping();
 	;
 }

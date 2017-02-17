@@ -15,6 +15,8 @@ var guild_role_name = config.has('guild.member_role') ? config.get('guild.member
 
 var open_codes = {}; // Codes we're currently expecting to see in an API key name
 
+var memberObject;
+
 function requestAPIKey(user) {
 	var code = Math.random().toString(36).toUpperCase().substr(2, 5);
 	open_codes[user.id] = {
@@ -43,7 +45,8 @@ function checkUserAccount(user, callback) {
 				function(next) { db.removeUser(user.id, next); },
 				function(next) {
 					if (! world_role_name) return next();
-					async.each(bot.servers, function(s, next_server) {
+					async.each(bot.guilds, function(s, next_server) {
+						s = s[1];
 						var world_role = s.roles.get('name', world_role_name);
 						if (user.hasRole(world_role)) user.removeFrom(world_role, next_server)
 						else next_server();
@@ -61,7 +64,8 @@ function checkUserAccount(user, callback) {
 		}
 		var in_guild = (account.guilds.indexOf(guild_id) > -1);
 		db.setUserAccount(user.id, account, function(err) {
-			async.each(bot.servers, function(s, next_server) {
+			async.each(bot.guilds, function(s, next_server) {
+				s = s[1];
 				async.parallel([
 					function(next) {
 						if (! world_role_name) return next();
@@ -94,10 +98,10 @@ function checkUserAccount(user, callback) {
 }
 
 function messageReceived(message) {
-	if (message.channel.type == "dm") {
-		if (message.content.match(new RegExp('^!?'+phrases.get("LINK_LINK")+'$', 'i'))) {
+		if (message.content.match(new RegExp('^!('+phrases.get("LINK_LINK")+')$', 'i'))) {
 			// User wants to change API key
-			requestAPIKey(message.author);
+			memberObject = message.member;
+			requestAPIKey(message.member);
 		}
 		if (open_codes[message.author.id]) {
 			var oc = open_codes[message.author.id];
@@ -122,7 +126,7 @@ function messageReceived(message) {
 					db.setUserKey(message.author.id, key, token, function(err) {
 						message.reply(phrases.get("LINK_KEY_DETAILS", { name: token.name, permissions: permissions }));
 						delete open_codes[message.author.id];
-						checkUserAccount(message.author);
+						checkUserAccount(memberObject);
 					});
 				});
 			}
@@ -133,9 +137,8 @@ function messageReceived(message) {
 			});
 		}
 		if (message.content === "account") {
-			checkUserAccount(message.author);
+			checkUserAccount(memberObject);
 		}
-	}
 }
 
 function presenceChanged(oldUser, newUser) {
@@ -150,6 +153,7 @@ function newMember(server, user) {
 
 function initServer(server, callback) {
 	if (! callback) callback = function() { };
+	server = server[1];
 	async.parallel([
 		function(next) {
 			if (! guild_role_name) return next();
@@ -184,6 +188,6 @@ module.exports = function(bot) {
 	bot.on("serverCreated", initServer);
 
 	bot.on("ready", function() {
-		async.each(bot.servers, initServer);
+		async.each(bot.guilds, initServer);
 	});
 };
