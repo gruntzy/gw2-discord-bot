@@ -45,10 +45,9 @@ function checkUserAccount(user, callback) {
 				function(next) { db.removeUser(user.id, next); },
 				function(next) {
 					if (! world_role_name) return next();
-					async.each(bot.guilds, function(s, next_server) {
-						s = s[1];
-						var world_role = s.roles.get('name', world_role_name);
-						if (user.hasRole(world_role)) user.removeFrom(world_role, next_server)
+					async.each(bot.guilds.array(), function(s, next_server) {
+						var world_role = s.roles.find('name', world_role_name);
+						if (user.roles.exists('name', world_role_name)) user.removeRole(world_role, next_server)
 						else next_server();
 					}, next);
 				}
@@ -64,27 +63,26 @@ function checkUserAccount(user, callback) {
 		}
 		var in_guild = (account.guilds.indexOf(guild_id) > -1);
 		db.setUserAccount(user.id, account, function(err) {
-			async.each(bot.guilds, function(s, next_server) {
-				s = s[1];
+			async.each(bot.guilds.array(), function(s, next_server) {
 				async.parallel([
 					function(next) {
 						if (! world_role_name) return next();
-						var world_role = s.roles.get('name', world_role_name);
+						var world_role = s.roles.find('name', world_role_name);
 						// Add or remove from guild world role
-						if (account.world !== world_id && user.hasRole(world_role)) {
-							user.removeFrom(world_role, next);
+						if (account.world !== world_id && user.roles.exists('name', world_role_name)) {
+							user.removeRole(world_role, next);
 						}
-						else if (account.world === world_id && ! user.hasRole(world_role)) {
-							user.addTo(world_role, next);
+						else if (account.world === world_id && ! user.roles.exists('name', world_role_name)) {
+							user.addRole(world_role, next);
 						}
 						else next();
 					},
 					function(next) {
 						// Add or remove from member role
 						if (! guild_role_name) return next();
-						var guild_role = s.roles.get('name', guild_role_name);
-						if (in_guild && ! user.hasRole(guild_role)) user.addTo(guild_role, next);
-						else if (user.hasRole(guild_role) && ! in_guild) user.removeFrom(guild_role, next);
+						var guild_role = s.roles.find('name', guild_role_name);
+						if (in_guild && ! user.roles.exists('name', guild_role_name)) user.addRole(guild_role, next);
+						else if (user.roles.exists('name', guild_role_name) && ! in_guild) user.removeRole(guild_role, next);
 						else next();
 					}
 				], next_server);
@@ -98,7 +96,7 @@ function checkUserAccount(user, callback) {
 }
 
 function messageReceived(message) {
-		if (message.content.match(new RegExp('^!('+phrases.get("LINK_LINK")+')$', 'i'))) {
+		if (message.content.match(new RegExp('^!('+phrases.get("LINK_LINK")+')$', 'i')) && message.channel.type != "dm") {
 			// User wants to change API key
 			memberObject = message.member;
 			requestAPIKey(message.member);
@@ -153,11 +151,10 @@ function newMember(server, user) {
 
 function initServer(server, callback) {
 	if (! callback) callback = function() { };
-	server = server[1];
 	async.parallel([
 		function(next) {
 			if (! guild_role_name) return next();
-			if (server.roles.has('name', guild_role_name)) next();
+			if (server.roles.exists('name', guild_role_name)) next();
 			else server.createRole({
 				name: guild_role_name,
 				hoist: false,
@@ -166,7 +163,7 @@ function initServer(server, callback) {
 		},
 		function(next) {
 			if (! world_role_name) return next();
-			if (server.roles.has('name', world_role_name)) next();
+			if (server.roles.exists('name', world_role_name)) next();
 			else server.createRole({
 				name: world_role_name,
 				hoist: false,
@@ -188,6 +185,6 @@ module.exports = function(bot) {
 	bot.on("serverCreated", initServer);
 
 	bot.on("ready", function() {
-		async.each(bot.guilds, initServer);
+		async.each(bot.guilds.array(), initServer);
 	});
 };

@@ -11,9 +11,9 @@ function messageReceived(message) {
 	const channelAsync = Promise.promisifyAll(message.channel);
 
 	if (message.content.match(new RegExp(`^!${phrases.get("WHOIS_WHOIS")} (.*)?$`, "i"))) {
-		if (message.content.indexOf("@") === -1) return; // No mentions? No answer
-		const user = [];
-		user.id = message.content.split("@")[1].split(">").join("");
+		var mentions = message.mentions.users.array();
+		if (mentions.length === 0) return; // No mentions? No answer
+		const user = mentions[0];
 		channelAsync.startTypingAsync();
 
 			// Get the GW2 account data by user
@@ -24,7 +24,7 @@ function messageReceived(message) {
 
 				// Construct message
 				if (user.id === message.author.id) return phrases.get("WHOIS_SELF", { account_name: account.name });
-				else return phrases.get("WHOIS_KNOWN", { user: "<@" + user.id + ">", account_name: account.name });
+				else return phrases.get("WHOIS_KNOWN", { user: user.mention(), account_name: account.name });
 			})
 			.catch(err => {
 				// Capture errors and construct proper fail message
