@@ -287,8 +287,8 @@ function coinsToGold(coins) {
 }
 
 function presenceChanged(oldState, newState) {
-	var isPlaying  = (newState.game && newState.game.name === "Guild Wars 2");
-	var wasPlaying = (oldState.game && oldState.game.name === "Guild Wars 2");
+	var isPlaying  = (newState.presence.game && newState.presence.game.name === "Guild Wars 2");
+	var wasPlaying = (oldState.presence.game && oldState.presence.game.name === "Guild Wars 2");
 	if (isPlaying && ! wasPlaying) {
 		// User started playing
 		startPlaying(newState);
