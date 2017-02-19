@@ -182,7 +182,7 @@ module.exports = function(bot) {
 	bot.on("message", messageReceived);
 	bot.on("presenceUpdate", presenceChanged);
 	//bot.on("serverNewMember", newMember);
-	bot.on("serverCreate", initServer);
+	bot.on("guildCreate", initServer);
 
 	bot.on("ready", function() {
 		async.each(bot.guilds.array(), initServer);
