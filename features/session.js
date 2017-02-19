@@ -287,8 +287,8 @@ function coinsToGold(coins) {
 }
 
 function presenceChanged(oldState, newState) {
-	var isPlaying  = (newState.game && newState.game.name === "Guild Wars 2");
-	var wasPlaying = (oldState.game && oldState.game.name === "Guild Wars 2");
+	var isPlaying  = (newState.presence.game && newState.presence.game.name === "Guild Wars 2");
+	var wasPlaying = (oldState.presence.game && oldState.presence.game.name === "Guild Wars 2");
 	if (isPlaying && ! wasPlaying) {
 		// User started playing
 		startPlaying(newState);
@@ -315,21 +315,21 @@ function messageReceived(message) {
 	if (! message.content.match(cmd)) return;
 	var messageAsync = Promise.promisifyAll(message);
 	var channelAsync = Promise.promisifyAll(message.channel);
-	channelAsync.startTyping()
-	.then(() => parseSession(message.author))
+	channelAsync.startTypingAsync();
+	parseSession(message.author)
 	.catch(err => {
 		if (err.message === "no session") return phrases.get("SESSION_NO_SESSION");
 		console.error(err.stack);
 		return phrases.get("CORE_ERROR");
 	})
-	.then(response => messageAsync.reply(response))
-	.then(() => channelAsync.stopTyping());
+	.then(response => messageAsync.reply(response));
+	channelAsync.stopTypingAsync();
 }
 
 module.exports = function(bot) {
 	bot.on("ready", () => {
 		checkUsers(bot.users);
 	});
-	bot.on("presence", presenceChanged);
+	bot.on("presenceUpdate", presenceChanged);
 	bot.on("message", messageReceived);
 }

@@ -63,8 +63,8 @@ module.exports = function(bot) {
 			});
 		}
 
-		var channels = bot.channels.getAll('name', channel_name);
-		channels.forEach(channel => bot.setChannelTopic(channel, text));
+		var channels = bot.channels.findAll('name', channel_name);
+		channels.forEach(channel => channel.setTopic(text));
 	});
 
 	bot.on("message", messageReceived);
