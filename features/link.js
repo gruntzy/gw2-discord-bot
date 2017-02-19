@@ -140,7 +140,7 @@ function messageReceived(message) {
 }
 
 function presenceChanged(oldUser, newUser) {
-	if (oldUser.status !== 'online' && newUser.status === 'online') checkUserAccount(newUser);
+	if (oldUser.presence.status !== 'online' && newUser.presence.status === 'online') checkUserAccount(newUser);
 }
 
 function newMember(server, user) {
@@ -180,9 +180,9 @@ gw2.on('/v2/account', (account, key, from_cache) => {
 
 module.exports = function(bot) {
 	bot.on("message", messageReceived);
-	bot.on("presence", presenceChanged);
+	bot.on("presenceUpdate", presenceChanged);
 	//bot.on("serverNewMember", newMember);
-	bot.on("serverCreated", initServer);
+	bot.on("serverCreate", initServer);
 
 	bot.on("ready", function() {
 		async.each(bot.guilds.array(), initServer);
