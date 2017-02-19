@@ -24,7 +24,7 @@ function messageReceived(message) {
 
 				// Construct message
 				if (user.id === message.author.id) return phrases.get("WHOIS_SELF", { account_name: account.name });
-				else return phrases.get("WHOIS_KNOWN", { user: user.mention(), account_name: account.name });
+				else return phrases.get("WHOIS_KNOWN", { user: "<@" + user.id + ">", account_name: account.name });
 			})
 			.catch(err => {
 				// Capture errors and construct proper fail message
