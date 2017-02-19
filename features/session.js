@@ -330,6 +330,6 @@ module.exports = function(bot) {
 	bot.on("ready", () => {
 		checkUsers(bot.users);
 	});
-	bot.on("presence", presenceChanged);
+	bot.on("presenceUpdate", presenceChanged);
 	bot.on("message", messageReceived);
 }
