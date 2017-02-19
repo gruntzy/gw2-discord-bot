@@ -98,7 +98,7 @@ function messageReceived(message) {
 			// User wants to change API key
 			requestAPIKey(message.member);
 		}
-		if (open_codes[message.author.id]) {
+		if (open_codes[message.author.id] && message.channel.type == "dm") {
 			var oc = open_codes[message.author.id];
 			// We're waiting on an API key for this user
 			var match = message.content.match(/\w{8}-\w{4}-\w{4}-\w{4}-\w{20}-\w{4}-\w{4}-\w{4}-\w{12}/);
