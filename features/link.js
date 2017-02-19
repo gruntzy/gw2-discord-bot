@@ -15,8 +15,6 @@ var guild_role_name = config.has('guild.member_role') ? config.get('guild.member
 
 var open_codes = {}; // Codes we're currently expecting to see in an API key name
 
-var memberObject;
-
 function requestAPIKey(user) {
 	var code = Math.random().toString(36).toUpperCase().substr(2, 5);
 	open_codes[user.id] = {
@@ -98,7 +96,6 @@ function checkUserAccount(user, callback) {
 function messageReceived(message) {
 		if (message.content.match(new RegExp('^!('+phrases.get("LINK_LINK")+')$', 'i')) && message.channel.type != "dm") {
 			// User wants to change API key
-			memberObject = message.member;
 			requestAPIKey(message.member);
 		}
 		if (open_codes[message.author.id]) {
@@ -124,18 +121,15 @@ function messageReceived(message) {
 					db.setUserKey(message.author.id, key, token, function(err) {
 						message.reply(phrases.get("LINK_KEY_DETAILS", { name: token.name, permissions: permissions }));
 						delete open_codes[message.author.id];
-						checkUserAccount(memberObject);
+						checkUserAccount(oc.user);
 					});
 				});
 			}
 		}
-		if (message.content === "showtoken") {
+		if (message.content === "showtoken" && message.channel.type == "dm") {
 			db.getUserToken(message.author.id, (err, token) => {
 				message.reply('```'+token+'```');
 			});
-		}
-		if (message.content === "account") {
-			checkUserAccount(memberObject);
 		}
 }
 
