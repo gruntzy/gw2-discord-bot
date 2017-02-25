@@ -16,7 +16,7 @@ Unless specified otherwise, each feature can be excluded by removing it from fea
 
 ### Linking
 
-This feature can not be disabled.  This allows users to identify themselves to the bot by providing an API key from Anet.  To initiate the process send a **direct message** to the bot with the word "link". If the option for world role is set, any users on the specified world will be added to that role.  If the option for guild role is set any users in that guild will be added to that role.
+This feature can not be disabled.  This allows users to identify themselves to the bot by providing an API key from Anet.  To initiate the process, type "!link" in a channel with the bot. If the option for world role is set, any users on the specified world will be added to that role.  If the option for guild role is set any users in that guild will be added to that role.
 
 ### Ranks
 
@@ -32,7 +32,7 @@ This will reply with the score for the current WvW matchup.  If the user has giv
 
 * `!score` - The overall score of each world and their PPT.
 * `!relscore` - Only the overall score of the top server is given, the second and third place scores are given as the difference to the world above.
-* `!kd` - The kill/death ratio for each world
+* `!kd [all|ebg|redbl|bluebl|greenbl]` - The kill/death ratio for each world overall or per-map.
 
 ### Progression
 

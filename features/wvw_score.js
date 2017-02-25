@@ -43,10 +43,15 @@ function formatWorldNames(worlds, color) {
 }
 
 function messageReceived(message) {
-	var score_cmd = phrases.get("WVWSCORE_SCORE");
-	var relscore_cmd = phrases.get("WVWSCORE_RELSCORE");
-	var kd_cmd = phrases.get("WVWSCORE_KD");
-	if (! message.content.match(new RegExp('^!('+score_cmd+'|'+relscore_cmd+'|'+kd_cmd+')$', 'i'))) return;
+	var score_cmd = new RegExp('^!'+phrases.get("WVWSCORE_SCORE")+'$', 'i');
+	var relscore_cmd = new RegExp('^!'+phrases.get("WVWSCORE_RELSCORE")+'$', 'i');
+	var kd_cmd = new RegExp('^!('+phrases.get("WVWSCORE_KD")+')?$', 'i');
+	var kd_cmd_extended = new RegExp('^!('+phrases.get("WVWSCORE_KD")+') (all|ebg|bluebl|greenbl|redbl)?$', 'i');
+
+	var matches = message.content.match(score_cmd) || message.content.match(relscore_cmd) || message.content.match(kd_cmd) || message.content.match(kd_cmd_extended);
+	if (! matches) return;
+	var cmd = matches[1];
+
 	async.waterfall([
 		function(next) {
 			message.channel.startTyping();
@@ -70,14 +75,54 @@ function messageReceived(message) {
 					var color = colors[c];
 					names[color] = [ match.worlds[color] ].concat(match.all_worlds[color].filter(w => (w !== match.worlds[color]))).map(w => worlds[w].name);
 				}
-				var scores = Object.keys(match.worlds).map(color => ({
-					color: color,
-					names: names[color],
-					score: match.scores[color],
-					ppt: countPPT(match, color),
-					kills: match.kills[color],
-					deaths: match.deaths[color]
-				}));
+
+				if (cmd === phrases.get("WVWSCORE_KD")) {
+					var type = matches[2] || "all";
+					if (type == "all") {
+						var scores = Object.keys(match.worlds).map(color => ({
+							color: color,
+							names: names[color],
+							score: match.scores[color],
+							ppt: countPPT(match, color),
+							kills: match.kills[color],
+							deaths: match.deaths[color]
+						}));
+					} else {
+						var mapName = "";
+						if (type == "ebg") {
+							mapName = "Center";
+						} else if (type == "redbl") {
+							mapName = "RedHome";
+						} else if (type == "bluebl") {
+							mapName = "BlueHome";
+						} else if (type == "greenbl") {
+							mapName = "GreenHome";
+						}
+
+						for (var map in match.maps) {
+							if (match.maps[map].type == mapName) {
+								var scores = Object.keys(match.worlds).map(color => ({
+									color: color,
+									names: names[color],
+									score: match.scores[color],
+									ppt: countPPT(match, color),
+									kills: match.maps[map].kills[color],
+									deaths: match.maps[map].deaths[color]
+								}));
+							}
+						}
+					}
+				} else {
+					var scores = Object.keys(match.worlds).map(color => ({
+						color: color,
+						names: names[color],
+						score: match.scores[color],
+						ppt: countPPT(match, color),
+						kills: match.kills[color],
+						deaths: match.deaths[color]
+					}));
+				}
+
 				next(null, scores);
 			});
 		}
@@ -85,11 +130,13 @@ function messageReceived(message) {
 		if (err) console.log(err.message);
 		var result;
 		if (scores) {
-			if (message.content.match(new RegExp('^!'+score_cmd+'$', 'i')))
+			if (message.content.match(score_cmd))
 				result = scores.sort((a, b) => (b.score - a.score)).map(world => (formatWorldNames(world.names, world.color)+': '+world.score.toLocaleString()+' (+'+world.ppt+')')).join("\n");
-			else if (message.content.match(new RegExp('^!'+kd_cmd+'$', 'i')))
+			else if (message.content.match(kd_cmd))
 				result = scores.sort((a, b) => ((b.kills / b.deaths) - (a.kills / a.deaths))).map(world => (formatWorldNames(world.names, world.color)+': '+world.kills.toLocaleString()+'/'+world.deaths.toLocaleString()+' = '+(world.kills / world.deaths).toLocaleString())).join("\n");
-			else if (message.content.match(new RegExp('^!'+relscore_cmd+'$', 'i'))) {
+			else if (message.content.match(kd_cmd_extended))
+				result = scores.sort((a, b) => ((b.kills / b.deaths) - (a.kills / a.deaths))).map(world => (formatWorldNames(world.names, world.color)+': '+world.kills.toLocaleString()+'/'+world.deaths.toLocaleString()+' = '+(world.kills / world.deaths).toLocaleString())).join("\n");
+			else if (message.content.match(relscore_cmd)) {
 				var sorted = scores.sort((a, b) => (b.score - a.score));
 				result = sorted.map((world, index) => (formatWorldNames(world.names, world.color)+': '+((index === 0) ? world.score : world.score - sorted[index - 1].score).toLocaleString() +' (+'+world.ppt+')')).join("\n");
 			}
