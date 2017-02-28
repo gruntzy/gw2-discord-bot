@@ -113,8 +113,8 @@ function stopPlaying(user) {
 
 function checkUsers(users) {
 	users.forEach(user => {
-		if (! user.game) return;
-		if (user.game.name !== "Guild Wars 2") return;
+		if (! user.presence.game) return;
+		if (user.presence.game.name !== "Guild Wars 2") return;
 		startPlaying(user);
 	});
 }
