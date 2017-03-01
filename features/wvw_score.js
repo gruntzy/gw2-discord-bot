@@ -14,7 +14,7 @@ function countPPT(match, color) {
 	return match.maps.reduce((total_ppt, map) => {
 		return total_ppt + map.objectives.reduce((map_ppt, objective) => {
 			if (objective.owner.toLowerCase() !== color) return map_ppt;
-			var value = objective_values[objective.type] || 0;
+			var value = objective.points_tick;
 			return map_ppt + value;
 		}, 0);
 	}, 0);
