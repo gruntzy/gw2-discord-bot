@@ -1,0 +1,10 @@
+{
+	"WVWSCORE_SCORE": "score",
+	"WVWSCORE_RELSCORE": "relscore",
+	"WVWSCORE_KD": "kd",
+	"WVW_SCORE_HELP": "**__Score McM__**\n\n`!score` - Affiche les score McM de votre serveur.\n`!relscore` - Affiche le score McM du premier serveur, avec les différences de score avec les serveurs en 2e et 3e place.\n`!kd` - Affiche le ratio kill/death de votre serveur McM.",
+	"WVWSCORE_GREEN_COLOR": "Vert",
+	"WVWSCORE_RED_COLOR": "Rouge",
+	"WVWSCORE_BLUE_COLOR": "Bleu",
+	"WVWSCORE_ERROR": "Désolé, je ne peux pas déterminer les scores McM pour le moment."
+}

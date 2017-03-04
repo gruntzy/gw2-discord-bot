@@ -1,0 +1,5 @@
+{
+	"LI_CMD": "li",
+	"LI_HELP": "**__Insignes Légendaires__**\n\n`!li` - Affiche le nombre d'insigne légendaire que vous possédez.",
+	"LI_SHOW": "Vous avez %{count} Insignes Légendaires."
+}

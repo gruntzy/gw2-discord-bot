@@ -1,0 +1,9 @@
+{
+	"LINK_LINK": "link",
+	"LINK_HELP": "**__Association du compte__**\n\n`link` - Démarre la procédure d'ajout d'une clé d'API (uniquement en message privé)",
+	"LINK_REPLY_WITH_KEY": "SVP répondez avec une clé d'API de https://account.arena.net/applications - Ajoutez le code **%{code}** dans le nom de la clé.",
+	"LINK_ERROR": "Désolé, une erreur s'est produite. Veuillez réessayer ultérieurement",
+	"LINK_KEY_DOESNT_MATCH": "Le nom de la clé que vous avez fournie ne contient pas le code **%{code}**. Veuillez créer une nouvelle clé, en ajoutant ce code dans le nom de la clé.",
+	"LINK_KEY_DETAILS": "La clé **%{name}** a été associée à votre compte discord. Cette clé donne les autorisations suivantes : %{permissions}",
+	"LINK_WELCOME": "Bienvenue ! Envoyez-moi le message \"link\" lorsque vous serez prêts à ajouter une clé d'API Guild Wars 2."
+}

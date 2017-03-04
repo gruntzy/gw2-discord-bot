@@ -1,0 +1,8 @@
+{
+  "WHOIS_WHOIS": "whois",
+  "WHOIS_HELP": "**__Whois__**\n\n`!whois <@user>` - Renvoie le nom de compte Guild Wars 2 du joueur.",
+  "WHOIS_KNOWN": "%{user} est %{account_name}.",
+  "WHOIS_UNKNOWN": "Je ne connais pas cet utilisateur. L'utilisateur n'a pas associé sa clé d'API",
+  "WHOIS_BOT": "Salutations, je suis %{user}!",
+  "WHOIS_SELF": "Avez-vous oublié qui vous êtes ? Vous êtes %{account_name}!"
+}

@@ -1,0 +1,19 @@
+{
+	"BUILDS_BUILD": "build",
+	"BUILDS_EQUIP": "equip",
+	"BUILDS_PRIVACY": "privacy",
+	"BUILDS_HELP": "**__Builds__**\n\n`!build [nom_du_personnage] (pve|wvw|pvp)` - Montre les spécialisations et aptitudes du personnage pour le mode de jeu demandé.\n`!equip [nom_du_personnage]` - Liste l'équipement du personnage.\n`!privacy [nom_du_personnage] (private|guild|public)` - Autorise les autres membres à voir le build de votre personnage avec [nom_du_personnage] @mention",
+	"BUILDS_NO_CHARACTER": "Vous n'avez pas de personnage nommé \"%{name}\".",
+	"BUILDS_TRAITS": "Aptitudes",
+	"BUILDS_LEGENDS": "Légendes",
+	"BUILDS_SKILLS": "Compétences",
+	"BUILDS_HEAL": "Soin",
+	"BUILDS_UTILITIES": "Utilitaires",
+	"BUILDS_ELITE": "Elite",
+	"BUILDS_ARMOR": "Armure",
+	"BUILDS_TRINKETS": "Bijoux",
+	"BUILDS_WEAPONS": "Armes",
+	"BUILDS_TOO_MANY_MENTIONS": "SVP ne mentionnez qu'un seul utilisateur.",
+	"BUILDS_PRIVATE": "Désolé, les builds de cet utilisateur sont privés.",
+	"BUILDS_PRIVACY_SET": "La confidentialité de votre build a été mise à jour."
+}

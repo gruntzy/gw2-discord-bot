@@ -1,0 +1,9 @@
+{
+	"WIKI_WIKI": "wiki",
+	"WIKI_HELP": "**__Wiki__**\n\n`!wiki <title>` - Recherche un article sur le wiki, et renvoie un résumé et un lien vers l'article si possible.",
+	"WIKI_LINK": "%{title}: %{url}",
+	"WIKI_MORE": "Plus d'informations: %{url}",
+	"WIKI_NO_TERM": "Je ne sais pas quoi rechercher. Veuillez ajouter le titre d'un article wiki ou des mots clés.",
+	"WIKI_NOT_FOUND": "Je n'ai pas trouvé ce que vous recherchiez. Veuillez essayer avec d'autres termes",
+	"WIKI_ERROR": "Quelque chose s'est mal passé. %{error}"
+}

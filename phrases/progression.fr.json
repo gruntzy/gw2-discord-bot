@@ -1,0 +1,7 @@
+{
+	"PROGRESSION_FRACTAL": "fractal[\\s_]?level",
+	"PROGRESSION_WVW": "wvw[\\s_]?rank",
+	"PROGRESSION_HELP": "**__Progression__**\n\n`!fractal level` - Affiche votre niveau actuel en fractales.\n`!wvw rank` - Affiche votre rang McM.",
+	"PROGRESSION_FRACTAL_LEVEL": "Votre niveau en fractales est %{level}.",
+	"PROGRESSION_WVW_RANK": "Votre rang McM est %{title} (%{rank})."
+}
