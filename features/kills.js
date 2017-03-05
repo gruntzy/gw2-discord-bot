@@ -32,7 +32,6 @@ function getRaids(user) {
   .then(result => {
     var out=phrases.get("KILLS_REPLY");
     var raids=result[0], kills=result[1];
-    console.log("RAIDS ARE : " + JSON.stringify(result));
     raids.forEach(function(item, index) {
       out += '**__' + item.id + '__**' + "\n";
       item.wings.forEach(function(wing, index) {
