@@ -47,17 +47,17 @@ function messageReceived(message) {
 	if (! message.content.match(cmd)) return;
 	var messageAsync = Promise.promisifyAll(message);
 	var channelAsync = Promise.promisifyAll(message.channel);
-	channelAsync.startTyping()
-	.then(() => countLI(message.author))
-	.then(count => messageAsync.reply(phrases.get("LI_SHOW", { count })))
+	channelAsync.startTypingAsync();
+	countLI(message.author)
+	.then(count => messageAsync.replyAsync(phrases.get("LI_SHOW", { count })))
 	.catch(err => {
-		if (err.message === "endpoint requires authentication") return messageAsync.reply(phrases.get("CORE_NO_KEY"));
-		if (err.message === "inventories permissions required") return messageAsync.reply(phrases.get("CORE_MISSING_SCOPE", { scope: 'inventories' }));
-		if (err.message === "characters permissions required") return messageAsync.reply(phrases.get("CORE_MISSING_SCOPE", { scope: 'characters' }));
+		if (err.message === "endpoint requires authentication") return messageAsync.replyAsync(phrases.get("CORE_NO_KEY"));
+		if (err.message === "inventories permissions required") return messageAsync.replyAsync(phrases.get("CORE_MISSING_SCOPE", { scope: 'inventories' }));
+		if (err.message === "characters permissions required") return messageAsync.replyAsync(phrases.get("CORE_MISSING_SCOPE", { scope: 'characters' }));
 		console.error(err.stack);
-		return messageAsync.reply(phrases.get("CORE_ERROR"));
-	})
-	.then(() => channelAsync.stopTyping());
+		return messageAsync.replyAsync(phrases.get("CORE_ERROR"));
+	});
+	channelAsync.stopTypingAsync();
 }
 
 module.exports = function(bot) {

@@ -11,27 +11,26 @@ function messageReceived(message) {
 	const channelAsync = Promise.promisifyAll(message.channel);
 
 	if (message.content.match(new RegExp(`^!${phrases.get("WHOIS_WHOIS")} (.*)?$`, "i"))) {
-		if (message.mentions.length === 0) return; // No mentions? No answer
-		const user = message.mentions[0];
-		channelAsync.startTypingAsync()
-			.then(() => {
-				if (user.id === bot_user.id) throw new Error("bot user");
+		var mentions = message.mentions.users.array();
+		if (mentions.length === 0) return; // No mentions? No answer
+		const user = mentions[0];
+		channelAsync.startTypingAsync();
 
-				// Get the GW2 account data by user
-				return db.getAccountByUserAsync(user.id);
-			})
-			.then(account => {
+			// Get the GW2 account data by user
+			db.getAccountByUserAsync(user.id)
+				.then(account => {
+				if (user.id === bot_user.id) throw new Error("bot user");
 				if (!account) throw new Error("unknown user");
 
 				// Construct message
 				if (user.id === message.author.id) return phrases.get("WHOIS_SELF", { account_name: account.name });
-				else return phrases.get("WHOIS_KNOWN", { user: user.mention(), account_name: account.name });
+				else return phrases.get("WHOIS_KNOWN", { user: "<@" + user.id + ">", account_name: account.name });
 			})
 			.catch(err => {
 				// Capture errors and construct proper fail message
 				switch (err.message) {
 					case "bot user":
-						return phrases.get("WHOIS_BOT", { user: bot_user.mention() });
+						return phrases.get("WHOIS_BOT", { user: "<@" + bot_user.id + ">" });
 					case "unknown user":
 						return phrases.get("WHOIS_UNKNOWN");
 					default:
@@ -39,8 +38,8 @@ function messageReceived(message) {
 						return;
 				}
 			})
-			.finally(() => channelAsync.stopTypingAsync())
 			.then(text => messageAsync.replyAsync(text));
+			channelAsync.stopTypingAsync();
 	}
 }
 

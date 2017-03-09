@@ -50,16 +50,16 @@ function messageReceived(message) {
 	if (! message.content.match(cmd)) return;
   var messageAsync = Promise.promisifyAll(message);
 	var channelAsync = Promise.promisifyAll(message.channel);
-	channelAsync.startTyping()
-	.then(() => getRaids(message.author))
-  .then(res => messageAsync.reply(res))
+	channelAsync.startTyping();
+	getRaids(message.author)
+  .then(res => messageAsync.replyAsync(res))
 	 .catch((err) => {
-	 		if (err.message === "endpoint requires authentication") return messageAsync.reply(phrases.get("CORE_NO_KEY"));
- 			if (err.message === "progression permission required") return messageAsync.reply(phrases.get("CORE_MISSING_SCOPE", { scope: 'progression' }));
+	 		if (err.message === "endpoint requires authentication") return messageAsync.replyAsync(phrases.get("CORE_NO_KEY"));
+ 			if (err.message === "progression permission required") return messageAsync.replyAsync(phrases.get("CORE_MISSING_SCOPE", { scope: 'progression' }));
     console.error(err.stack);
-    return messageAsync.reply(phrases.get("CORE_ERROR"));
+    return messageAsync.replyAsync(phrases.get("CORE_ERROR"));
   })
-  .then(() => channelAsync.stopTyping());
+  channelAsync.stopTypingAsync();
 
 }
 

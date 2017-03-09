@@ -10,7 +10,10 @@ function messageReceived(message) {
 	var wvw_cmd = phrases.get("PROGRESSION_WVW");
 	if (! message.content.match(new RegExp('^!('+fractal_cmd+'|'+wvw_cmd+')$', 'i'))) return;
 	async.waterfall([
-		function(next) { message.channel.startTyping(next); },
+		function(next) {
+			message.channel.startTyping();
+			next(null, '');
+		},
 		function(something, next) { db.checkKeyPermission(message.author.id, 'progression', next) },
 		function(hasPerm, next) {
 			if (! hasPerm) next(new Error("requires scope progression"));
@@ -28,25 +31,24 @@ function messageReceived(message) {
 				next(null, result);
 		}
 	], function(err, result) {
-		message.channel.stopTyping(function() {
-			if (err) {
-				if (err.message === "endpoint requires authentication") message.reply(phrases.get("CORE_NO_KEY"));
-				if (err.message === "requires scope progression") message.reply(phrases.get("CORE_MISSING_SCOPE", { scope: 'progression' }));
-				else {
-					message.reply(phrases.get("CORE_ERROR"));
-					console.log(err.message);
-				}
-				return;
+		message.channel.stopTyping();
+		if (err) {
+			if (err.message === "endpoint requires authentication") message.reply(phrases.get("CORE_NO_KEY"));
+			if (err.message === "requires scope progression") message.reply(phrases.get("CORE_MISSING_SCOPE", { scope: 'progression' }));
+			else {
+				message.reply(phrases.get("CORE_ERROR"));
+				console.log(err.message);
 			}
-			if (! result) {
-				message.reply(phrases.get("CORE_NO_KEY"));
-				return;
-			}
-			if (message.content.match(new RegExp('^!'+fractal_cmd+'$', 'i')))
-					message.reply(phrases.get("PROGRESSION_FRACTAL_LEVEL", { level: result.fractal_level }));
-			else if (message.content.match(new RegExp('^!'+wvw_cmd+'$', 'i')))
-					message.reply(phrases.get("PROGRESSION_WVW_RANK", { rank: result.wvw_rank, title: result.wvw_rank_name }));
-		});
+			return;
+		}
+		if (! result) {
+			message.reply(phrases.get("CORE_NO_KEY"));
+			return;
+		}
+		if (message.content.match(new RegExp('^!'+fractal_cmd+'$', 'i')))
+				message.reply(phrases.get("PROGRESSION_FRACTAL_LEVEL", { level: result.fractal_level }));
+		else if (message.content.match(new RegExp('^!'+wvw_cmd+'$', 'i')))
+				message.reply(phrases.get("PROGRESSION_WVW_RANK", { rank: result.wvw_rank, title: result.wvw_rank_name }));
 	});
 }
 
