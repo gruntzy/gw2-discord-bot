@@ -136,14 +136,18 @@ function messageReceived(message) {
 		return;
 	}
 	var discord_id = message.author.id;
-	if (message.mentions && message.mentions.length === 1) discord_id = message.mentions[0].id;
+	
 	var type = matches[3] || "pve"; // Default to PvE
 	type = type.toLowerCase();
 	var permissions_needed = ['characters'];
 	if (cmd === phrases.get("BUILDS_BUILD")) permissions_needed.push("builds");
 	if (cmd === phrases.get("BUILDS_EQUIP")) permissions_needed.push("inventories");
 	message.channel.startTyping();
-	if (message.mentions && message.mentions.length > 1) throw new Error("more than one mention");
+	var mentions = message.mentions.users.array();
+	if (mentions.length>0) {
+		if (mentions.length > 1) throw new Error("more than one mention");
+		discord_id = mentions[0].id
+	}
 		var preamble = db.getUserKeyAsync(discord_id)
 		.then(key => {
 			if (! key) throw new Error("endpoint requires authentication");
