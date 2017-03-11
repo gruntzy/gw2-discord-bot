@@ -1,6 +1,6 @@
 {
 	"CORE_HELP": "help",
-	"CORE_NO_KEY": "Désolé, je ne sais pas qui vous êtes. Svp, envoyez moi la commande \"link\" en message privé pour ajouter une clé d'API Guild Wars 2",
+	"CORE_NO_KEY": "Désolé, je ne sais pas qui vous êtes. Veuillez utiliser la commande `!link` pour ajouter une clé d'API Guild Wars 2",
 	"CORE_MISSING_SCOPE": "You do not have the **%{scope}** permission on your API key. Message me \"link\" to add a new key with this permission.",
 	"CORE_MISSING_SCOPE": "Vous n'avez pas autorisé la permission **%{scope}** sur votre clé d'API. Envoyez-moi \"link\" en message privé pour ajouter une nouvelle clé d'API avec cette permission.",
 	"CORE_GOLD": "%{count}g",
