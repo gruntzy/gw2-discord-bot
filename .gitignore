@@ -56,3 +56,7 @@ jspm_packages
 
 # Atom remote-sync file
 .remote-sync.json
+
+# Ftp sync file
+.ftpconfig
+.ftpignore
