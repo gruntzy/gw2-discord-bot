@@ -1,0 +1,8 @@
+{
+  "INVITE_INVITE": "invite",
+  "INVITE_HELP": "**__Invite__**\n\n`!invite` - Generates an invite link to the discord.",
+  "INVITE_REPLY": "Use the following link to invite people to **%{channel}** :",
+  "INVITE_NO_CHANNEL": "No channel has been configured for invites.",
+  "INVITE_CHANNEL_NOT_FOUND": "The channel configured for the invites doesn't exist !",
+  "INVITE_NO_PERMISSION": "You don't have the permission to generate invite links"
+}

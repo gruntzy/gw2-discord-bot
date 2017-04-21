@@ -1,0 +1,8 @@
+{
+  "INVITE_INVITE": "invite",
+  "INVITE_HELP": "**__Invite__**\n\n`!invite` - Crée un lien d'invitation vers le serveur discord.",
+  "INVITE_REPLY": "Utilisez le lien suivant pour inviter des gens dans le canal **%{channel}** :",
+  "INVITE_NO_CHANNEL": "Aucun canal n'a été configuré pour les invitations",
+  "INVITE_CHANNEL_NOT_FOUND": "Le canal configuré pour les invitations n'existe pas !",
+  "INVITE_NO_PERMISSION": "Vous n'avez pas le droit de créer des liens d'invitation"
+}
