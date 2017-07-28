@@ -13,7 +13,7 @@ var create_roles = config.has('guild.create_roles') ? config.get('guild.create_r
 
 // Create necessary roles in discord.  Can't seem to get the sorting working, so that has to be done manually.
 function initServer(server, ranks) {
-	if (! create_roles) return;
+	if (! create_roles) return Promise.resolve();
 	return Promise.all(ranks
 		.filter(r => ! server.roles.exists('name', r.id))
 		.map(r => server.createRole({
