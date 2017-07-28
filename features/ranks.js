@@ -13,7 +13,7 @@ var create_roles = config.has('guild.create_roles') ? config.get('guild.create_r
 
 // Create necessary roles in discord.  Can't seem to get the sorting working, so that has to be done manually.
 function initServer(server, ranks) {
-	if (! create_roles) return;
+	if (! create_roles) return Promise.resolve();
 	return Promise.all(ranks
 		.filter(r => ! server.roles.exists('name', r.id))
 		.map(r => server.createRole({
@@ -46,6 +46,7 @@ function syncMembersToRoles(server, members, ranks) {
 					if (member_role && ! user.roles.has(member_role.id)) funcs.push(() => user.addRole(member_role));
 					ranks.forEach(rank => {
 						var role = server.roles.find('name', rank.id);
+						if (!role) return;
 						if (rank.id === member.rank) {
 							membersInRank[member.rank].push(member.name);
 							if (! user.roles.has(role.id)) funcs.push(() => user.addRole(role));
