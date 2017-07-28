@@ -15,8 +15,8 @@ var create_roles = config.has('guild.create_roles') ? config.get('guild.create_r
 function initServer(server, ranks) {
 	if (! create_roles) return;
 	return Promise.all(ranks
-		.filter(r => ! server.roles.find('name', r.id))
-		.map(r => server.createRoleAsync({
+		.filter(r => ! server.roles.exists('name', r.id))
+		.map(r => server.createRole({
 			name: r.id,
 			hoist: true,
 			mentionable: true
@@ -37,20 +37,20 @@ function syncMembersToRoles(server, members, ranks) {
 			var allMembers = [];
 			var member_role = (member_role_name) ? server.roles.find('name', member_role_name) : null;
 			return Promise.all(members
-				.filter(member => server.roles.find('name', member.rank)) // Ignore rank with no corresponding role
+				.filter(member => server.roles.exists('name', member.rank)) // Ignore rank with no corresponding role
 				.map(member => db.getUserByAccountAsync(member.name).then(user_id => {
 					if (! user_id) return;
 					allMembers.push(member.name);
-					var user = Promise.promisifyAll(server.members.get(user_id));
+					var user = server.members.get(user_id);
 					var funcs = [];
-					if (member_role && ! user.roles.exists('name', member_role_name)) funcs.push(() => user.addRole(member_role));
+					if (member_role && ! user.roles.has(member_role.id)) funcs.push(() => user.addRole(member_role));
 					ranks.forEach(rank => {
 						var role = server.roles.find('name', rank.id);
 						if (rank.id === member.rank) {
 							membersInRank[member.rank].push(member.name);
-							if (! user.roles.exists('name', rank.id)) funcs.push(() => user.addRole(role));
+							if (! user.roles.has(role.id)) funcs.push(() => user.addRole(role));
 						} else {
-							if (user.roles.exists('name', rank.id)) funcs.push(() => user.removeRole(role));
+							if (user.roles.has(role.id)) funcs.push(() => user.removeRole(role));
 						}
 					});
 					//return funcs.reduce((p, f) => p.then(f), Promise.resolve());
@@ -62,13 +62,12 @@ function syncMembersToRoles(server, members, ranks) {
 				var promises = [];
 				var funcs = [];
 				if (member_role) {
-					var users_with_role = server.members.filter(m => m.roles.exists("name", member_role_name));
+					var users_with_role = member_role.members;
 					promises = promises.concat(
 						users_with_role.map(user =>
 							db.getAccountByUserAsync(user.id)
 							.then(account => {
-								var userAsync = Promise.promisifyAll(user);
-								if (! account || allMembers.indexOf(account.name) === -1) funcs.push(() => userAsync.removeRole(member_role));
+								if (! account || allMembers.indexOf(account.name) === -1) funcs.push(() => user.removeRole(member_role));
 								return true;
 							})
 						)
@@ -76,10 +75,9 @@ function syncMembersToRoles(server, members, ranks) {
 				}
 				ranks.filter(rank => server.roles.exists('name', rank.id)).forEach(rank => {
 					var role = server.roles.find('name', rank.id);
-					var users_with_role = server.members.filter(m => m.roles.exists("name", rank.id));
+					var users_with_role = role.members;
 					promises = promises.concat(users_with_role.map(user => db.getAccountByUserAsync(user.id).then(account => {
-						var userAsync = Promise.promisifyAll(user);
-						if (! account || membersInRank[rank.id].indexOf(account.name) === -1) funcs.push(() => userAsync.removeRole(role));
+						if (! account || membersInRank[rank.id].indexOf(account.name) === -1) funcs.push(() => user.removeRole(role));
 						return true;
 					})));
 				});
@@ -94,13 +92,14 @@ function syncMembersToRoles(server, members, ranks) {
 }
 
 function messageReceived(message) {
-	if (message.channel.type == "dm") {
+	if (message.channel.type === 'dm') {
 		if (message.content === "refresh members") {
 			message.channel.startTyping();
-			gw2.request('/v2/guild/'+guild_id+'/members', guild_key, function() {
-				message.channel.stopTyping();
-				message.reply(phrases.get("RANKS_MEMBERS_UPDATED"));
-			});
+			gw2.request('/v2/guild/'+guild_id+'/members', guild_key)
+				.then(() => message.reply(phrases.get("RANKS_MEMBERS_UPDATED")))
+				.catch(e => console.error(e.stack))
+				.then(() => message.channel.stopTyping())
+			;
 		}
 	}
 }
@@ -108,14 +107,20 @@ function messageReceived(message) {
 function botReady(bot) {
 	gw2.request('/v2/guild/'+guild_id+'/ranks', guild_key)
 		.then(ranks => Promise.all(
-			bot.guilds.array().map(server => initServer(Promise.promisifyAll(server), ranks))
+			bot.guilds.map(server => initServer(server, ranks))
 		))
+		.catch(e => {
+			console.error(`Error retrieving /v2/guild/${guild_id}/ranks: ${e.message}`);
+		})
 	;
 }
 
 function joinedServer(server) {
 	gw2.request('/v2/guild/'+guild_id+'/ranks', guild_key)
-		.then(ranks => initServer(Promise.promisifyAll(server), ranks))
+		.then(ranks => initServer(server, ranks))
+		.catch(e => {
+			console.error(`Error retrieving /v2/guild/${guild_id}/ranks: ${e.message}`);
+		})
 	;
 }
 
@@ -128,7 +133,7 @@ module.exports = function(bot) {
 	gw2.on('/v2/guild/'+guild_id+'/members', (members, key, from_cache) => {
 		gw2.request('/v2/guild/'+guild_id+'/ranks', key)
 			.then(ranks => Promise.all(
-				bot.guilds.array().map(server => syncMembersToRoles(Promise.promisifyAll(server), members, ranks))
+				bot.guilds.map(server => syncMembersToRoles(server, members, ranks))
 			))
 		;
 	});

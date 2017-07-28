@@ -76,7 +76,7 @@ function startPlaying(user) {
 		})
 		.catch(err => {
 			if (err.message === "endpoint requires authentication") return;
-			console.error(err.stack);
+			console.error("Error starting session: "+err.message);
 		});
 	});
 }
@@ -105,8 +105,9 @@ function stopPlaying(user) {
 		})
 		.catch(err => {
 			if (err.message === "endpoint requires authentication") return;
+			if (err.message === "invalid key") return;
 			if (err.message === "no session") throw err; // rethrow
-			console.error(err.stack);
+			console.error("Error stopping session: " + err.message);
 		});
 	});
 }
@@ -270,8 +271,9 @@ function parseSession(user) {
 	})
 	.catch(err => {
 		if (err.message === "endpoint requires authentication") return;
+		if (err.message === "invalid key") return;
 		if (err.message === "no session") throw err;
-		console.error(err.stack);
+		console.error("Error gathering session data: "+e.message);
 	});
 }
 
@@ -300,12 +302,14 @@ function presenceChanged(oldState, newState) {
 			setTimeout(function() {
 				stopPlaying(newState).catch(err => {
 					if (err.message === "no session") return;
-					console.error(err.stack);
+					if (err.message === "invalid key") return;
+					console.error("Error stopping session: " + err.message);
 				});
 			}, 305000);
 		}).catch(err => {
 			if (err.message === "no session") return;
-			console.error(err.stack);
+			if (err.message === "invalid key") return;
+			console.error("Error stopping session: " + err.message);
 		});
 	}
 }
@@ -313,17 +317,15 @@ function presenceChanged(oldState, newState) {
 function messageReceived(message) {
 	var cmd = new RegExp('^!'+phrases.get("SESSION_SHOWLAST")+'$', 'i');
 	if (! message.content.match(cmd)) return;
-	var messageAsync = Promise.promisifyAll(message);
-	var channelAsync = Promise.promisifyAll(message.channel);
-	channelAsync.startTypingAsync();
+	message.channel.startTyping();
 	parseSession(message.author)
 	.catch(err => {
 		if (err.message === "no session") return phrases.get("SESSION_NO_SESSION");
 		console.error(err.stack);
 		return phrases.get("CORE_ERROR");
 	})
-	.then(response => messageAsync.reply(response));
-	channelAsync.stopTypingAsync();
+	.then(response => message.reply(response))
+	.then(() => message.channel.stopTyping());
 }
 
 module.exports = function(bot) {

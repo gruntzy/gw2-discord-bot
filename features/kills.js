@@ -16,7 +16,7 @@ function getRaids(user) {
       var permissions = token.permissions || [];
 			if (permissions.indexOf('progression') === -1) throw new Error('progression permission required');
       return Promise.all([
-        gw2.requestAsync('/v2/raids', key)
+        gw2.request('/v2/raids', key)
           .then(raids => {
             var queries = [];
             raids.forEach(function(id) {
@@ -25,7 +25,7 @@ function getRaids(user) {
         		return Promise.map(queries, q => q.promise());
           }) ,
 
-        gw2.requestAsync('/v2/account/raids', key)
+        gw2.request('/v2/account/raids', key)
       ])
     })
   // ])
@@ -48,18 +48,16 @@ function getRaids(user) {
 function messageReceived(message) {
 	var cmd = new RegExp('^!' + phrases.get('KILLS_KILLS') + '$', 'i');
 	if (! message.content.match(cmd)) return;
-  var messageAsync = Promise.promisifyAll(message);
-	var channelAsync = Promise.promisifyAll(message.channel);
-	channelAsync.startTyping();
+	message.channel.startTyping();
 	getRaids(message.author)
-  .then(res => messageAsync.replyAsync(res))
+  .then(res => message.reply(res))
 	 .catch((err) => {
-	 		if (err.message === "endpoint requires authentication") return messageAsync.replyAsync(phrases.get("CORE_NO_KEY"));
- 			if (err.message === "progression permission required") return messageAsync.replyAsync(phrases.get("CORE_MISSING_SCOPE", { scope: 'progression' }));
+	 		if (err.message === "endpoint requires authentication") return message.reply(phrases.get("CORE_NO_KEY"));
+ 			if (err.message === "progression permission required") return message.reply(phrases.get("CORE_MISSING_SCOPE", { scope: 'progression' }));
     console.error(err.stack);
-    return messageAsync.replyAsync(phrases.get("CORE_ERROR"));
+    return message.reply(phrases.get("CORE_ERROR"));
   })
-  channelAsync.stopTypingAsync();
+  .then(() => message.channel.stopTyping());
 
 }
 
