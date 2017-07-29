@@ -37,7 +37,6 @@ function syncMembersToRoles(server, members, ranks) {
 			var allMembers = [];
 			var member_role = (member_role_name) ? server.roles.find('name', member_role_name) : null;
 			return Promise.all(members
-				.filter(member => server.roles.exists('name', member.rank)) // Ignore rank with no corresponding role
 				.map(member => db.getUserByAccountAsync(member.name).then(user_id => {
 					if (! user_id) return;
 					allMembers.push(member.name);
